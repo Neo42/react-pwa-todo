@@ -8,6 +8,42 @@ import Back from './back.png'
 const ITEMS_URL = 'http://192.168.199.102:4567/items.json'
 
 const Profile = () => {
+  const [image, setImage] = React.useState(null)
+  const [isCameraEnabled, setIsCameraEnabled] = React.useState(false)
+
+  const doesSupportCamera = React.useRef('mediaDevices' in navigator)
+  const videoRef = React.useRef(null)
+  const canvasRef = React.useRef(null)
+
+  const updateImage = (e) => setImage(URL.createObjectURL(e.target.files[0]))
+
+  const onToggleCamera = () => {
+    setIsCameraEnabled(!isCameraEnabled)
+  }
+
+  const onTakeImage = () => {
+    const canvas = canvasRef.current
+    const video = videoRef.current
+
+    canvas.width = video.videoWidth
+    canvas.height = video.videoHeight
+    canvas
+      .getContext('2d')
+      .drawImage(video, 0, 0, video.videoWidth, video.videoHeight)
+
+    video.srcObject.getVideoTracks().forEach((track) => track.stop())
+    setImage(canvas.toDataURL())
+    setIsCameraEnabled(false)
+  }
+
+  React.useEffect(() => {
+    if (isCameraEnabled && videoRef.current) {
+      navigator.mediaDevices
+        .getUserMedia({video: true})
+        .then((stream) => (videoRef.current.srcObject = stream))
+    }
+  }, [isCameraEnabled, videoRef])
+
   return (
     <div>
       <nav className="navbar navbar-light bg-light">
@@ -21,11 +57,29 @@ const Profile = () => {
 
       <div style={{textAlign: 'center'}}>
         <img
-          src={GreyProfile}
+          src={image ?? GreyProfile}
           alt="profile"
           style={{height: 200, marginTop: 50}}
         />
         <p style={{color: '#888', fontSize: 20}}>username</p>
+
+        {isCameraEnabled ? (
+          <div>
+            <video
+              ref={videoRef}
+              controls={false}
+              autoPlay
+              style={{width: '100%', maxWidth: 300}}></video>
+            <br />
+            <button onClick={onTakeImage}>Take Image</button>
+            <canvas ref={canvasRef} style={{display: 'none'}} />
+          </div>
+        ) : null}
+
+        <br />
+        {doesSupportCamera.current ? (
+          <button onClick={onToggleCamera}>Toggle Camera</button>
+        ) : null}
       </div>
     </div>
   )
