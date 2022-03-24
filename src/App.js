@@ -2,6 +2,8 @@ import React from 'react'
 import logo from './logo.svg'
 import './App.css'
 
+const ITEMS_URL = 'http://192.168.199.102:4567/items.json'
+
 function App() {
   const [items, setItems] = React.useState([])
   const [isLoading, setIsLoading] = React.useState(true)
@@ -10,7 +12,7 @@ function App() {
   const [isOffline, setIsOffline] = React.useState(!navigator.onLine)
 
   React.useEffect(() => {
-    fetch('http://localhost:4567/items.json')
+    fetch(ITEMS_URL)
       .then((response) => response.json())
       .then((items) => {
         setItems(items)
@@ -30,7 +32,7 @@ function App() {
   const addItem = (e) => {
     e.preventDefault()
 
-    fetch('http://localhost:4567/items.json', {
+    fetch(ITEMS_URL, {
       method: 'POST',
       body: JSON.stringify({item: todoItem}),
       headers: {
@@ -50,7 +52,7 @@ function App() {
   }
 
   const deleteItem = (itemId) => {
-    fetch('http://localhost:4567/items.json', {
+    fetch(ITEMS_URL, {
       method: 'DELETE',
       body: JSON.stringify({id: itemId}),
       headers: {
