@@ -37,6 +37,7 @@
   }
 }
 
-.close {
+button.close {
   border: none;
+  background-color: transparent;
 }
