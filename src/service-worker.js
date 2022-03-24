@@ -63,4 +63,13 @@ addEventListener('fetch', (event) => {
   }
 })
 
+self.addEventListener('push', (event) => {
+  event.waitUntil(
+    self.registration.showNotification('Todo List', {
+      icon: '/icon-120.png',
+      body: event.data.text(),
+    }),
+  )
+})
+
 precacheAndRoute(self.__WB_MANIFEST || [])

@@ -7,6 +7,24 @@ import Back from './back.png'
 
 const ITEMS_URL = 'http://192.168.199.102:4567/items.json'
 
+/**
+ * urlBase64ToUint8Array
+ *
+ * @param {string} base64String a public vavid key
+ */
+function urlBase64ToUint8Array(base64String) {
+  var padding = '='.repeat((4 - (base64String.length % 4)) % 4)
+  var base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/')
+
+  var rawData = window.atob(base64)
+  var outputArray = new Uint8Array(rawData.length)
+
+  for (var i = 0; i < rawData.length; ++i) {
+    outputArray[i] = rawData.charCodeAt(i)
+  }
+  return outputArray
+}
+
 const Profile = () => {
   const [image, setImage] = React.useState(null)
   const [isCameraEnabled, setIsCameraEnabled] = React.useState(false)
@@ -15,7 +33,32 @@ const Profile = () => {
   const videoRef = React.useRef(null)
   const canvasRef = React.useRef(null)
 
-  const updateImage = (e) => setImage(URL.createObjectURL(e.target.files[0]))
+  React.useEffect(() => {
+    if (isCameraEnabled && videoRef.current) {
+      navigator.mediaDevices
+        .getUserMedia({video: true})
+        .then((stream) => (videoRef.current.srcObject = stream))
+    }
+  }, [isCameraEnabled, videoRef])
+
+  const onPushMessage = () => {
+    global.registration.showNotification('Test Message', {
+      icon: '/icon-120.png',
+      body: 'Success!',
+    })
+  }
+
+  const onSubscribe = () => {
+    const key =
+      'BClkWYXjylL583hsafMJAKvIexe3t7ut5WlNCe-YhPCMUDt1IskA7JXeZxoWhdJN9CBc4sgiD226DzCA0w8invM'
+    global.registration.pushManager
+      .subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(key),
+      })
+      .then((subscribe) => console.log('Subscribed!'))
+      .catch((error) => console.log('Failed to subscribe.'))
+  }
 
   const onToggleCamera = () => {
     setIsCameraEnabled(!isCameraEnabled)
@@ -35,14 +78,6 @@ const Profile = () => {
     setImage(canvas.toDataURL())
     setIsCameraEnabled(false)
   }
-
-  React.useEffect(() => {
-    if (isCameraEnabled && videoRef.current) {
-      navigator.mediaDevices
-        .getUserMedia({video: true})
-        .then((stream) => (videoRef.current.srcObject = stream))
-    }
-  }, [isCameraEnabled, videoRef])
 
   return (
     <div>
@@ -80,6 +115,10 @@ const Profile = () => {
         {doesSupportCamera.current ? (
           <button onClick={onToggleCamera}>Toggle Camera</button>
         ) : null}
+        <br />
+        <button onClick={onSubscribe}>Subscribe for Notifications</button>
+        <br />
+        <button onClick={onPushMessage}>Test Push Message</button>
       </div>
     </div>
   )
