@@ -1,6 +1,6 @@
 {
-  "short_name": "PWA Todo List",
-  "name": "PWA Todo List",
+  "short_name": "Todo List",
+  "name": "My PWA Todo List",
   "icons": [
     {
       "src": "favicon.ico",
