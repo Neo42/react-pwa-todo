@@ -7,6 +7,7 @@
 // You can also remove this file if you'd prefer not to use a
 // service worker, and the Workbox build step will be skipped.
 
+// import {createInstance} from 'localforage'
 import {clientsClaim, skipWaiting} from 'workbox-core'
 import {precacheAndRoute} from 'workbox-precaching'
 import {registerRoute} from 'workbox-routing'
@@ -15,6 +16,15 @@ import {
   NetworkFirst,
   StaleWhileRevalidate,
 } from 'workbox-strategies'
+
+// const itemStore = createInstance({
+//   name: 'pwa-todo-app',
+//   storeName: 'items',
+// })
+// const inputStore = createInstance({
+//   name: 'pwa-todo-app',
+//   storeName: 'input',
+// })
 
 skipWaiting()
 clientsClaim()
@@ -61,6 +71,20 @@ addEventListener('fetch', (event) => {
       ),
     )
   }
+  // localforage with server data routed to cache
+  // if (event.request.url.includes('items.json')) {
+  //   event.respondWith(
+  //     (async function () {
+  //       const response = await fetch(event.request)
+  //       let data = await response.clone().json()
+  //       console.log(data)
+  //       // if (data.items.length > 0) {
+  //       //   data.items.forEach(({id, item}) => itemStore.setItem(id, item))
+  //       // }
+  //       // return response
+  //     })(),
+  //   )
+  // }
 })
 
 self.addEventListener('push', (event) => {

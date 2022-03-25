@@ -5,7 +5,7 @@ import './App.css'
 import GreyProfile from './grey_profile.png'
 import Back from './back.png'
 
-const ITEMS_URL = 'http://192.168.199.102:4567/items.json'
+const ITEMS_URL = 'http://[YOUR_LOCAL_IP]:4567/items.json'
 
 /**
  * urlBase64ToUint8Array
